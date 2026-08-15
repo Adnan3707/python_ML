@@ -2,37 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
-
 dataset = pd.read_csv('Position_Salaries.csv')
 X = dataset.iloc[:, 1:-1].values
 y = dataset.iloc[:, -1].values
-# print(dataset)
+print(X)
 
-from sklearn.linear_model import LinearRegression
-lin_reg = LinearRegression()
-lin_reg.fit(X, y)
+y=y.reshape(len(y),1)
+print(y)
 
-# Training the Polynomial Regression model on the whole dataset
-from sklearn.preprocessing import PolynomialFeatures
-poly_reg = PolynomialFeatures(degree = 4)
-X_poly = poly_reg.fit_transform(X)
-lin_reg_2 = LinearRegression()
-lin_reg_2.fit(X_poly, y)
+# Fet=ature scaling
+from sklearn.preprocessing import StandardScaler
+sc_X = StandardScaler()
+sc_y = StandardScaler()
+X = sc_X.fit_transform(X)
+y = sc_y.fit_transform(y)
 
-# plt.scatter(X, y, color = 'red')
-# plt.plot(X, lin_reg.predict(X), color = 'blue')
-# plt.title('Truth or Bluff (Linear Regression)')
-# plt.xlabel('Position Level')
-# plt.ylabel('Salary')
-# plt.show()
+# Traning SVR Model
+from sklearn.svm import SVR
+regressor = SVR(kernel = 'rbf')
+regressor.fit(X,y)
 
-plt.scatter(X, y, color = 'red')
-plt.plot(X, lin_reg_2.predict(poly_reg.fit_transform(X)), color = 'blue')
-plt.title('Truth or Bluff (Polynomial Regression)')
-plt.xlabel('Position level')
-plt.ylabel('Salary')
-plt.show()
-
-print(lin_reg_2.predict(poly_reg.fit_transform([[6.5]])))
+sc_y.inverse_transform(regressor.predict(sc_X.transform([[6.5]])).reshape(-1,1))
